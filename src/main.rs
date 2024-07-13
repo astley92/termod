@@ -17,8 +17,6 @@ use widget::Widget;
 use main_widget::MainWidget;
 use debug_widget::DebugWidget;
 
-const FPS: u16 = 30;
-
 fn main() {
     let mut running = true;
     let mut stdout = stdout();
@@ -28,7 +26,7 @@ fn main() {
 
     let (mut w_width, mut w_height) = terminal::size().unwrap();
     let mut main_widget = MainWidget::new(0, 0, w_width, w_height);
-    let mut debug_widget = DebugWidget::new(1, w_height-5, w_width-2, 4);
+    let mut debug_widget = DebugWidget::new(1, w_height-11, w_width-2, 10);
 
     while running {
         main_widget.reset_buffer();
@@ -48,17 +46,17 @@ fn main() {
                     w_width = new_width;
                     w_height = new_height;
                     main_widget.resize(new_width, new_height);
-                    debug_widget.resize(new_width-2, 4);
-                    debug_widget.move_to(1, new_height-5);
+                    debug_widget.resize(new_width-2, 10);
+                    debug_widget.move_to(1, new_height-11);
                 },
                 _ => {}
             };
         };
-        
+
         // Update
         main_widget.update();
         debug_widget.update();
-        
+
         // Draw
         main_widget.draw();
         debug_widget.draw();
