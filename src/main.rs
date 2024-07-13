@@ -98,7 +98,6 @@ impl Character {
     }
 }
 
-
 mod utils {
     pub fn linear_pos_from_x_y(x: u16, y: u16, width: u16) -> u16 {
         let adjusted_y = y * width;
@@ -134,18 +133,18 @@ fn main() {
         // Event
         if event::poll(std::time::Duration::from_millis((1000 / FPS) as u64)).unwrap() {
             let event = event::read().unwrap();
-            
-            if let event::Event::Key(event::KeyEvent{
-                code: event::KeyCode::Char(ch),
-                kind: event::KeyEventKind::Press,
-                modifiers: _,
-                state: _,
-            }) = event {
-                if ch == 'q' {
-                    state.running = false;
-                }
-                let character = Character::from_char(ch);
-                buffer.insert_ch(character.clone());
+            match event {
+                event::Event::Key(event) => {
+                    match event.code {
+                        event::KeyCode::Char(ch) => {
+                            let character = Character::from_char(ch);
+                            buffer.insert_ch(character.clone());
+                        },
+                        event::KeyCode::Esc => { state.running = false },
+                        _ => {}
+                    }
+                },
+                _ => {}
             };
         };
         
