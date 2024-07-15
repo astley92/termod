@@ -4,6 +4,7 @@ use crossterm::style;
 pub struct Character {
     pub character: char,
     pub attributes: Vec<style::Attribute>,
+    pub fg_colour: Option<style::Color>,
 }
 
 impl Character {
@@ -11,6 +12,7 @@ impl Character {
         let character = Character {
             character: ch,
             attributes: vec![],
+            fg_colour: None,
         };
 
         return character;
@@ -22,5 +24,9 @@ impl Character {
         } else {
             self.attributes.push(style::Attribute::Reverse)
         }
+    }
+
+    pub fn set_fg_colour(&mut self, colour: style::Color) {
+        self.fg_colour = Some(colour);
     }
 }

@@ -94,6 +94,14 @@ impl Widget for MainWidget {
             sub_widget.update(); 
             self.buffer.insert_chars(chars.clone());
         };
+
+        let sub_widget = &mut self.sub_widgets[self.active_subwidget_index];
+        sub_widget.draw();
+        let sub_buffer = sub_widget.get_buffer();
+        match sub_buffer {
+            Some(buffer) => { self.buffer.insert_buffer(1, 1, buffer) },
+            _ => {}
+        }
     }
     
     fn move_to(&mut self, new_x: u16, new_y: u16) {

@@ -1,4 +1,5 @@
 use crossterm::event;
+use crate::buffer::Buffer;
 
 pub trait Widget {
     fn new(x: u16, y: u16, width: u16, height: u16) -> Self where Self: Sized;
@@ -13,5 +14,9 @@ pub trait Widget {
 
     fn title(&self) -> String {
         return "".to_string();
+    }
+    
+    fn get_buffer(&mut self) -> Option<&mut Buffer> {
+        return None;
     }
 }

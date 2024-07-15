@@ -7,6 +7,7 @@ use std::io::{stdout, Write};
 
 mod buffer;
 mod character;
+mod colours;
 mod widget;
 mod main_widget;
 mod debug_widget;
@@ -76,9 +77,15 @@ fn main() {
             for attr in &character.attributes {
                 stdout.queue(style::SetAttribute(*attr)).unwrap();
             };
+
+            match character.fg_colour {
+                Some(colour) => { stdout.queue(style::SetForegroundColor(colour)).unwrap(); }
+                _ => {},
+            }
             stdout
                 .queue(cursor::MoveTo(x as u16, y as u16)).unwrap()
                 .queue(style::Print(format!("{}", character.character as char))).unwrap()
+                .queue(style::ResetColor).unwrap()
                 .queue(style::SetAttribute(style::Attribute::Reset)).unwrap();
         }
 

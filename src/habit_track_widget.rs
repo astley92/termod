@@ -2,6 +2,12 @@ use crossterm::event;
 use crate::buffer::Buffer;
 use crate::widget::Widget;
 use crate::utils;
+use crate::colours;
+
+struct HabitState {
+    pub habits: Vec<String>,
+    pub selected_habit: usize,
+}
 
 pub struct HabitTrackWidget {
     pub x: u16,
@@ -9,6 +15,7 @@ pub struct HabitTrackWidget {
     pub width: u16,
     pub height: u16,
     pub buffer: Buffer,
+    state: HabitState,
 }
 
 impl HabitTrackWidget {
@@ -26,6 +33,13 @@ impl Widget for HabitTrackWidget {
             width: width,
             height: height,
             buffer: Buffer::empty(width, height),
+            state: HabitState { 
+                habits: vec![
+                    "No Smoking".to_string(),
+                    "No Drinking".to_string(),
+                ],
+                selected_habit: 0,
+            }
         }
     }
     
@@ -45,6 +59,16 @@ impl Widget for HabitTrackWidget {
     }
 
     fn draw(&mut self) {
+        for i in 0..self.state.habits.len() {
+            self.buffer.move_cursor_to_x_y(1, i as u16);
+            let mut chars = utils::char_vec_from_string(self.state.habits[i].clone());
+            if i == self.state.selected_habit {
+                for ch in &mut chars {
+                    ch.set_fg_colour(colours::DIMMED_GREEN);
+                };
+            }
+            self.buffer.insert_chars(chars);
+        };
     }
 
     fn move_to(&mut self, new_x: u16, new_y: u16) {
@@ -54,5 +78,9 @@ impl Widget for HabitTrackWidget {
     
     fn title(&self) -> String {
         return "Habits".to_string();
+    }
+
+    fn get_buffer(&mut self) -> Option<&mut Buffer> {
+        return Some(&mut self.buffer);
     }
 }

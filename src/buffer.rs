@@ -18,6 +18,7 @@ impl Buffer {
                 let c = Character {
                     character: ' ',
                     attributes: vec![],
+                    fg_colour: None,
                 };
                 chars.push(c);
             }
