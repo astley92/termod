@@ -21,7 +21,7 @@ pub struct DebugWidget {
 
 impl DebugWidget {
     pub fn add_string(&mut self, str_to_add: String) {
-        let chars = utils::char_vec_from_string(str_to_add);
+        let chars = &utils::char_vec_from_string(str_to_add);
         self.buffer.insert_chars(chars);
     }
 }
@@ -69,9 +69,9 @@ impl Widget for DebugWidget {
 
     fn draw(&mut self) {
         let line_string = "-".repeat(self.width as usize);
-        let chars = utils::char_vec_from_string(line_string);
+        let chars = &utils::char_vec_from_string(line_string);
         self.buffer.move_cursor_to(0);
-        self.buffer.insert_chars(chars.clone());
+        self.buffer.insert_chars(chars);
         
         self.buffer.move_cursor_to_x_y(1, 1);
         let string = format!("Frame Count: {}", self.state.frame_count);

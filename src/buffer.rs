@@ -33,12 +33,12 @@ impl Buffer {
         } 
     }
 
-    pub fn insert_ch(&mut self, ch: Character) {
-        self.chars[self.curs_pos as usize] = ch;
+    pub fn insert_ch(&mut self, ch: &Character) {
+        self.chars[self.curs_pos as usize] = ch.clone();
         self.increment_cursor();
     }
 
-    pub fn insert_chars(&mut self, chars: Vec<Character>) {
+    pub fn insert_chars(&mut self, chars: &Vec<Character>) {
         for ch in chars {
             self.insert_ch(ch);
         };
@@ -76,7 +76,7 @@ impl Buffer {
                 let y = other_y + y_offset;
 
                 self.move_cursor_to_x_y(x, y);
-                self.insert_ch(other_buffer.chars[other_position as usize].clone());
+                self.insert_ch(&other_buffer.chars[other_position as usize]);
             }
         }
     }

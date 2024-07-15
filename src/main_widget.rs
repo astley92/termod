@@ -21,14 +21,14 @@ impl MainWidget {
         let horizontal_string = format!(" {} ", line_string);
         self.buffer.move_cursor_to(0);
         let chars = utils::char_vec_from_string(horizontal_string);
-        self.buffer.insert_chars(chars.clone());
+        self.buffer.insert_chars(&chars);
         self.buffer.move_cursor_to_x_y(0, self.buffer.height - 1);
-        self.buffer.insert_chars(chars);
+        self.buffer.insert_chars(&chars);
         for y in 1..self.height-1 {
             self.buffer.move_cursor_to_x_y(0, y);
-            self.buffer.insert_ch(Character::from_char('|'));
+            self.buffer.insert_ch(&Character::from_char('|'));
             self.buffer.move_cursor_to_x_y(self.width-1, y);
-            self.buffer.insert_ch(Character::from_char('|'));
+            self.buffer.insert_ch(&Character::from_char('|'));
         }
     }
 }
@@ -54,7 +54,7 @@ impl Widget for MainWidget {
                 match event_to_handle.code {
                     event::KeyCode::Char(ch) => {
                         let character = Character::from_char(ch);
-                        self.buffer.insert_ch(character.clone());
+                        self.buffer.insert_ch(&character);
                     },
                     event::KeyCode::Tab => {
                         self.active_subwidget_index = (self.active_subwidget_index + 1) % self.sub_widgets.len();
@@ -92,7 +92,7 @@ impl Widget for MainWidget {
                 }
             }
             sub_widget.update(); 
-            self.buffer.insert_chars(chars.clone());
+            self.buffer.insert_chars(&chars);
         };
 
         let sub_widget = &mut self.sub_widgets[self.active_subwidget_index];

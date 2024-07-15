@@ -20,7 +20,7 @@ pub struct HabitTrackWidget {
 
 impl HabitTrackWidget {
     pub fn add_string(&mut self, str_to_add: String) {
-        let chars = utils::char_vec_from_string(str_to_add);
+        let chars = &utils::char_vec_from_string(str_to_add);
         self.buffer.insert_chars(chars);
     }
 }
@@ -55,8 +55,7 @@ impl Widget for HabitTrackWidget {
         self.buffer = Buffer::empty(self.width, self.height); 
     }
 
-    fn update(&mut self) {
-    }
+    fn update(&mut self) {}
 
     fn draw(&mut self) {
         for i in 0..self.state.habits.len() {
@@ -67,7 +66,7 @@ impl Widget for HabitTrackWidget {
                     ch.set_fg_colour(colours::DIMMED_GREEN);
                 };
             }
-            self.buffer.insert_chars(chars);
+            self.buffer.insert_chars(&chars);
         };
     }
 
