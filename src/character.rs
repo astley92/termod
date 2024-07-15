@@ -15,4 +15,12 @@ impl Character {
 
         return character;
     }
+
+    pub fn toggle_reverse(&mut self) {
+        if self.attributes.contains(&style::Attribute::Reverse) {
+            self.attributes.retain(|x| *x != style::Attribute::Reverse)
+        } else {
+            self.attributes.push(style::Attribute::Reverse)
+        }
+    }
 }

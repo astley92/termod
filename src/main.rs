@@ -11,6 +11,7 @@ mod widget;
 mod main_widget;
 mod debug_widget;
 mod utils;
+mod habit_track_widget;
 
 use buffer::Buffer;
 use widget::Widget;

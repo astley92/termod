@@ -2,6 +2,7 @@ use crate::utils;
 use crate::character::Character;
 use crate::buffer::Buffer;
 use crate::widget::Widget;
+use crate::habit_track_widget::HabitTrackWidget;
 use crossterm::event;
 
 pub struct MainWidget {
@@ -10,6 +11,8 @@ pub struct MainWidget {
     pub width: u16,
     pub height: u16,
     pub buffer: Buffer,
+    sub_widgets: Vec<Box<dyn Widget>>,
+    active_subwidget_index: usize,
 }
 
 impl MainWidget {
@@ -38,6 +41,10 @@ impl Widget for MainWidget {
             width: width,
             height: height,
             buffer: Buffer::empty(width, height),
+            sub_widgets: vec![
+                Box::new(HabitTrackWidget::new(1, 1, width - 2, height - 2)),
+            ],
+            active_subwidget_index: 0,
         }
     }
 
@@ -48,6 +55,9 @@ impl Widget for MainWidget {
                     event::KeyCode::Char(ch) => {
                         let character = Character::from_char(ch);
                         self.buffer.insert_ch(character.clone());
+                    },
+                    event::KeyCode::Tab => {
+                        self.active_subwidget_index = (self.active_subwidget_index + 1) % self.sub_widgets.len();
                     },
                     _ => {}
                 }
@@ -70,6 +80,20 @@ impl Widget for MainWidget {
     
     fn draw(&mut self) {
         self.draw_box();
+        let mut title_offset: usize = 2;
+        for i in 0..self.sub_widgets.len() {
+            let sub_widget = &mut self.sub_widgets[i];
+            self.buffer.move_cursor_to_x_y(title_offset as u16, 0);
+            let mut chars = utils::char_vec_from_string(sub_widget.title());
+            title_offset += chars.len() + 1;
+            if i == self.active_subwidget_index {
+                for char in &mut chars {
+                    char.toggle_reverse();
+                }
+            }
+            sub_widget.update(); 
+            self.buffer.insert_chars(chars.clone());
+        };
     }
     
     fn move_to(&mut self, new_x: u16, new_y: u16) {
