@@ -126,7 +126,7 @@ fn main() {
 
     const DESIRED_FRAME_COUNT: usize = 1000;
     let mut times_taken: [f64; DESIRED_FRAME_COUNT] = [0.0; DESIRED_FRAME_COUNT];
-    let mut count = 0;
+    let mut count: usize = 0;
     while count < DESIRED_FRAME_COUNT {
         let start_time = std::time::Instant::now();
 
