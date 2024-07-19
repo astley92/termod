@@ -5,10 +5,7 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [[bin]]
-name = "random_chars_perf_test"
-
-[[bin]]
-name = "input_delay_perf_test"
+name = "example"
 
 [dependencies]
 crossterm = "0.27.0"

@@ -1,5 +1,8 @@
 use crate::character::Character;
 
+#[derive(Debug)]
+pub struct BufferMergeError;
+
 #[derive(Clone)]
 pub struct Buffer {
     width: u16,
@@ -49,6 +52,27 @@ impl Buffer {
 
         return true;
     }
+
+    pub fn merge(&self, other: &Buffer) -> Result<Buffer, BufferMergeError> {
+        if other.x + other.width > self.width {
+            return Err(BufferMergeError);
+        } else if other.y + other.height > self.height {
+            return Err(BufferMergeError);
+        }
+
+        let mut new_buff = self.clone();
+        for other_x in 0..other.width {
+            for other_y in 0..other.height {
+                let this_x = other_x + other.x;
+                let this_y = other_y + other.y;
+                let other_pos = other_y * other.width + other_x;
+                let this_pos = this_y * self.width + this_x;
+                new_buff[this_pos as usize] = other[other_pos as usize].clone();
+            }
+        }
+
+        return Ok(new_buff);
+    }
 }
 
 impl std::ops::Index<usize> for Buffer {
@@ -67,8 +91,87 @@ impl std::ops::IndexMut<usize> for Buffer {
 
 #[cfg(test)]
 mod tests {
+    use std::any::type_name;
+
     use super::*;
     use crossterm::style;
+
+    fn type_of<T>(_: &T) -> &'static str {
+        type_name::<T>()
+    }
+
+    #[test]
+    fn buffer_merge_returns_buffer() {
+        let buffer_one = Buffer::new(6, 3, 0, 0);
+        let mut buffer_two= Buffer::new(4, 1, 1, 1);
+        let attrs = style::Attributes::from(style::Attribute::Bold);
+        for i in 0..buffer_two.len() {
+            buffer_two[i] = Character {
+                c: '-',
+                colour: style::Color::Rgb { r: 0, g: 0, b: 0 },
+                attributes: attrs,
+            }
+        };
+
+        let response = buffer_one.merge(&buffer_two).unwrap();
+        assert_eq!(type_of(&response), "termod::buffer::Buffer");
+    }
+
+    #[test]
+    fn buffer_merge_returns_expected_buffer() {
+        let buffer_one = Buffer::new(6, 3, 0, 0);
+        let mut buffer_two= Buffer::new(4, 1, 1, 1);
+        let attrs = style::Attributes::from(style::Attribute::Bold);
+        for i in 0..buffer_two.len() {
+            buffer_two[i] = Character {
+                c: '-',
+                colour: style::Color::Rgb { r: 0, g: 0, b: 0 },
+                attributes: attrs,
+            }
+        };
+
+        let response = buffer_one.merge(&buffer_two).unwrap();
+        let expected_res = [
+            ' ', ' ', ' ', ' ', ' ', ' ', 
+            ' ', '-', '-', '-', '-', ' ', 
+            ' ', ' ', ' ', ' ', ' ', ' ',
+        ];
+        let result: Vec<char> = response.characters.into_iter().map(|x| x.c).collect();
+        for i in 0..result.len() {
+            assert_eq!(result[i], expected_res[i], "Incorrect at position {}", i);
+        }
+    }
+
+    #[test]
+    fn buffer_merge_doesnt_mutate_original_buffers() {
+        let buffer_one = Buffer::new(6, 3, 0, 0);
+        let mut buffer_two= Buffer::new(4, 1, 1, 1);
+        let attrs = style::Attributes::from(style::Attribute::Bold);
+        for i in 0..buffer_two.len() {
+            buffer_two[i] = Character {
+                c: '-',
+                colour: style::Color::Rgb { r: 0, g: 0, b: 0 },
+                attributes: attrs,
+            }
+        };
+
+        let _ = buffer_one.merge(&buffer_two).unwrap();
+        let expected_res = [
+            ' ', ' ', ' ', ' ', ' ', ' ', 
+            ' ', ' ', ' ', ' ', ' ', ' ', 
+            ' ', ' ', ' ', ' ', ' ', ' ',
+        ];
+        let result: Vec<char> = buffer_one.characters.into_iter().map(|x| x.c).collect();
+        for i in 0..result.len() {
+            assert_eq!(result[i], expected_res[i], "Incorrect at position {}", i);
+        }
+
+        let expected_res = ['-', '-', '-', '-'];
+        let result: Vec<char> = buffer_two.characters.into_iter().map(|x| x.c).collect();
+        for i in 0..result.len() {
+            assert_eq!(result[i], expected_res[i], "Incorrect at position {}", i);
+        }
+    }
 
     #[test]
     fn buffer_push_success() {
@@ -90,7 +193,6 @@ mod tests {
             ' ', ' ', ' ', ' ', ' ', ' ',
         ];
         let result: Vec<char> = buffer_one.characters.into_iter().map(|x| x.c).collect();
-        println!("{:?}", result);
         for i in 0..result.len() {
             assert_eq!(result[i], expected_res[i], "Incorrect at position {}", i);
         }
