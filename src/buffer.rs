@@ -90,7 +90,15 @@ impl std::ops::IndexMut<usize> for Buffer {
 }
 
 #[cfg(test)]
-mod tests {
+mod insert_char_slice_tests {
+    #[test]
+    fn returns_true_on_success() {
+        todo!("Implement me")
+    }
+}
+
+#[cfg(test)]
+mod merge_tests {
     use std::any::type_name;
 
     use super::*;
@@ -172,6 +180,12 @@ mod tests {
             assert_eq!(result[i], expected_res[i], "Incorrect at position {}", i);
         }
     }
+}
+
+#[cfg(test)]
+mod buffer_push_tests {
+    use super::*;
+    use crossterm::style;
 
     #[test]
     fn buffer_push_success() {

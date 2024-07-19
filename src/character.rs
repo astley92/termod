@@ -48,3 +48,12 @@ impl Character {
         };
     }
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn vec_from_string() {
+        todo!("Implement me");
+    }
+
+}
