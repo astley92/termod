@@ -4,8 +4,8 @@ use crate::character::Character;
 pub struct Buffer {
     width: u16,
     height: u16, 
-    x: u16,
-    y: u16,
+    pub x: u16,
+    pub y: u16,
     characters: Vec<Character>,
 }
 

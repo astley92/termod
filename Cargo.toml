@@ -7,6 +7,9 @@ edition = "2021"
 [[bin]]
 name = "random_chars_perf_test"
 
+[[bin]]
+name = "input_delay_perf_test"
+
 [dependencies]
 crossterm = "0.27.0"
 rand = "0.8.5"

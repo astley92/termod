@@ -30,7 +30,7 @@ fn main() {
     let mut buffer = Buffer::new(width, height, 0, 0);
     let mut prev_buffer = Buffer::new(width, height, 0, 0);
 
-    let mut input_buffer = Buffer::new(30, 10, 1, 1);
+    let mut input_buffer = Buffer::new(width - 2, height - 2, 1, 1);
     // run a loop
     //   - queue clearing the screen
     //   - queue printing each of those chars
@@ -38,12 +38,15 @@ fn main() {
 
     const DESIRED_FRAME_COUNT: usize = 100000;
     let mut times_taken: [f64; DESIRED_FRAME_COUNT] = [0.0; DESIRED_FRAME_COUNT];
+    let mut event_delays: Vec<f64> = vec![];
     let mut count: usize = 0;
     while count < DESIRED_FRAME_COUNT {
+        let mut event_seen_at: Option<std::time::Instant> = None;
         let start_time = std::time::Instant::now();
 
         // event
-        if event::poll(std::time::Duration::ZERO).unwrap() {
+        if event::poll(std::time::Duration::from_millis(10)).unwrap() {
+            event_seen_at = Some(std::time::Instant::now());
             let event = event::read().unwrap();
             match event {
                 event::Event::Key(event) => {
@@ -94,6 +97,12 @@ fn main() {
                 .queue(style::SetAttribute(style::Attribute::Reset)).unwrap();
         };
 
+        match event_seen_at {
+            Some(instant) => { 
+                event_delays.push(instant.elapsed().as_secs_f64());
+            },
+            None => {}
+        }
         stdout.flush().unwrap();
         prev_buffer = buffer.clone();
 
@@ -111,6 +120,9 @@ fn main() {
     let total_time_taken: f64 = times_taken[0..count].iter().sum();
     let average_frame_time = total_time_taken / count as f64;
     let average_fps = 1 as f64 / average_frame_time;
-    println!("{:?}", times_taken);
-    println!("Width:{}\nHeight:{}\nTotal Char Count:{}\nTotal time taken: {}\nAverage frame time:{}\nAverage FPS:{}", width, height, width*height,total_time_taken, average_frame_time, average_fps);
+
+    let total_event_delay: f64 = event_delays.iter().sum();
+    let average_event_delay = total_event_delay / event_delays.len() as f64;
+    println!("\nEvent to end of loop delays\n{:?}\n\n", event_delays);
+    println!("Average Event Delay:{}\nWidth:{}\nHeight:{}\nTotal Char Count:{}\nTotal time taken: {}\nAverage frame time:{}\nAverage FPS:{}", average_event_delay, width, height, width*height,total_time_taken, average_frame_time, average_fps);
 }
