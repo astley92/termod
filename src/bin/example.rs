@@ -4,55 +4,50 @@ use crossterm::terminal;
 use crossterm::style;
 use crossterm::event;
 use crossterm::cursor;
-use rand::rngs::ThreadRng;
-use rand::Rng;
 
-use termod::character::Character;
 use termod::buffer::Buffer;
+use termod::widget::Widget;
+use termod::dashboard_widget::*;
 
 fn main() {
-    // setup
-    // - raw mode
-    // - alternate screen
-
-    let mut rng: ThreadRng = rand::thread_rng();
     let mut stdout: Stdout = stdout();
     terminal::enable_raw_mode().unwrap();
     stdout.execute(terminal::EnterAlternateScreen).unwrap();
     stdout.execute(cursor::Hide).unwrap();
 
-    // build a block of random chars
-    // - random chars
-    // - random attrs
-    // - random colours
     let (width, height) = terminal::size().unwrap();
 
     let mut main_buffer= Buffer::new(width, height);
     let mut prev_buffer = Buffer::new(width, height);
+   
+    let mut dashboard_widget = Widget {
+        width: width-2,
+        height: height-2,
+        title: "Dashboard".to_string(),
+        init_fn: dashboard_init,
+        event_fn: dashboard_event,
+        update_fn: dashboard_update,
+        draw_fn: dashboard_draw,
+        generate_buffer_fn: dashboard_generate_buffer,
+        state: DashboardState { 
+            frame_count: 0, 
+            debug_x: 0, 
+            debug_y: 0,
+            bg_buffer: Buffer::new(0, 0),
+            debug_buffer: Buffer::new(0, 0),
+        }
+    };
+    dashboard_widget.init();
 
-    let mut bg_buffer= Buffer::new(width, height);
-    let mut input_buffer = Buffer::new(width / 2, height / 2);
-    let mut input_x: u16 = 10;
-    let mut input_y: u16 = 10;
-    let mut debug_buffer= Buffer::new(20,10);
-    // run a loop
-    //   - queue clearing the screen
-    //   - queue printing each of those chars
-    //   - flush stdout
-
-    let mut frame_count: u32 = 0;
     loop {
         // event
         if event::poll(std::time::Duration::from_millis(30)).unwrap() {
             let event = event::read().unwrap();
+            dashboard_widget.handle_event(&event);
             match event {
                 event::Event::Key(event) => {
                     match event.code {
                         event::KeyCode::Esc => { break },
-                        event::KeyCode::Left => { input_x -= 1 },
-                        event::KeyCode::Right => { input_x += 1 },
-                        event::KeyCode::Up => { input_y -= 1 },
-                        event::KeyCode::Down => { input_y += 1 },
                         _ => {}
                     }
                 },
@@ -61,20 +56,15 @@ fn main() {
         };
 
         // update
-        for i in 0..bg_buffer.len() {
-            let choice = rng.gen_range(0..1000);
-
-            if choice == 0 {
-                bg_buffer[i] = Character::random(&mut rng);
-            };
-        };
-        let fps_chars = Character::vec_from_string(&format!("Frame Count: {}", frame_count));
-        debug_buffer.insert_char_slice(0, &fps_chars);
+        dashboard_widget.update();
 
         // draw
-        input_buffer = input_buffer.merge(0, &debug_buffer).unwrap();
-        let input_buffer_position = input_x + input_y * main_buffer.width;
-        main_buffer = bg_buffer.merge(input_buffer_position as usize, &input_buffer).unwrap();
+        dashboard_widget.draw();
+
+        let dashboard_buffer = dashboard_widget.generate_buffer();
+        let insert_pos = width + 1;
+        main_buffer = main_buffer.merge(insert_pos as usize, &dashboard_buffer).unwrap();
+
         stdout
             .queue(terminal::Clear(terminal::ClearType::Purge)).unwrap()
             .queue(cursor::MoveTo(0,0)).unwrap();
@@ -100,7 +90,6 @@ fn main() {
 
         stdout.flush().unwrap();
         prev_buffer = main_buffer.clone();
-        frame_count += 1;
     };
 
     // clean up
