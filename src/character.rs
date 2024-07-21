@@ -47,13 +47,41 @@ impl Character {
             colour: colour,
         };
     }
+
+    pub fn vec_from_string(string: &String) -> Vec<Character> {
+        let mut result: Vec<Character> = vec![];
+        let mut attrs = style::Attributes::from(style::Attribute::Bold);
+        attrs.unset(style::Attribute::Bold);
+        let string_chars: Vec<char> = string.chars().collect();
+        for i in 0..string_chars.len() {
+            result.push(Character {
+                c: string_chars[i],
+                attributes: attrs,
+                colour: style::Color::Rgb { r: 100, g: 100, b: 100 }
+            })
+        }
+        return result;
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn vec_from_string() {
-        todo!("Implement me");
+    use std::any::type_name;
+    use super::*;
+
+    fn type_of<T>(_: &T) -> &'static str {
+        type_name::<T>()
     }
 
+    #[test]
+    fn vec_from_string() {
+        let starting_string = "Hello World".to_string();
+        let starting_string_chars: Vec<char> = starting_string.chars().collect();
+        let result = Character::vec_from_string(&starting_string);
+        for i in 0..starting_string.len() {
+            let character = &result[i];
+            assert_eq!(type_of(character), "termod::character::Character");
+            assert_eq!(character.c, starting_string_chars[i]);
+        }
+    }
 }

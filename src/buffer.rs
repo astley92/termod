@@ -55,8 +55,10 @@ impl Buffer {
 
     pub fn merge(&self, other: &Buffer) -> Result<Buffer, BufferMergeError> {
         if other.x + other.width > self.width {
+            println!("Too wide!!");
             return Err(BufferMergeError);
         } else if other.y + other.height > self.height {
+            println!("Too high!!");
             return Err(BufferMergeError);
         }
 
@@ -72,6 +74,13 @@ impl Buffer {
         }
 
         return Ok(new_buff);
+    }
+
+    pub fn insert_char_slice(&mut self, position: usize, chars: &Vec<Character>) {
+        for i in 0..chars.len() {
+            let offset = i + position;
+            self.characters[offset] = chars[i].clone()
+        }
     }
 }
 
@@ -91,9 +100,24 @@ impl std::ops::IndexMut<usize> for Buffer {
 
 #[cfg(test)]
 mod insert_char_slice_tests {
+    use super::*;
+    use crate::character::Character;
+
     #[test]
     fn returns_true_on_success() {
-        todo!("Implement me")
+        let mut buffer_one = Buffer::new(6, 3, 0, 0);
+        let string_chars = Character::vec_from_string(&"----".to_string());
+
+        buffer_one.insert_char_slice(7, &string_chars);
+        let expected_res = [
+            ' ', ' ', ' ', ' ', ' ', ' ', 
+            ' ', '-', '-', '-', '-', ' ', 
+            ' ', ' ', ' ', ' ', ' ', ' ',
+        ];
+        let result: Vec<char> = buffer_one.characters.into_iter().map(|x| x.c).collect();
+        for i in 0..result.len() {
+            assert_eq!(result[i], expected_res[i], "Incorrect at position {}", i);
+        }
     }
 }
 

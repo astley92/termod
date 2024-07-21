@@ -32,18 +32,16 @@ fn main() {
 
     let mut bg_buffer= Buffer::new(width, height, 0, 0);
     let mut input_buffer = Buffer::new(width / 2, height / 2, 10, 5);
+    let mut debug_buffer= Buffer::new(20,10,0, 0);
     // run a loop
     //   - queue clearing the screen
     //   - queue printing each of those chars
     //   - flush stdout
 
-    let mut event_delays: Vec<f64> = vec![];
+    let mut frame_count: u32 = 0;
     loop {
-        let mut event_seen_at: Option<std::time::Instant> = None;
-
         // event
         if event::poll(std::time::Duration::from_millis(30)).unwrap() {
-            event_seen_at = Some(std::time::Instant::now());
             let event = event::read().unwrap();
             match event {
                 event::Event::Key(event) => {
@@ -68,9 +66,12 @@ fn main() {
                 bg_buffer[i] = Character::random(&mut rng);
             };
         };
-        main_buffer = bg_buffer.merge(&input_buffer).unwrap();
+        let fps_chars = Character::vec_from_string(&format!("Frame Count: {}", frame_count));
+        debug_buffer.insert_char_slice(0, &fps_chars);
 
         // draw
+        input_buffer = input_buffer.merge(&debug_buffer).unwrap();
+        main_buffer = bg_buffer.merge(&input_buffer).unwrap();
         stdout
             .queue(terminal::Clear(terminal::ClearType::Purge)).unwrap()
             .queue(cursor::MoveTo(0,0)).unwrap();
@@ -94,14 +95,9 @@ fn main() {
                 .queue(style::SetAttribute(style::Attribute::Reset)).unwrap();
         };
 
-        match event_seen_at {
-            Some(instant) => { 
-                event_delays.push(instant.elapsed().as_secs_f64());
-            },
-            None => {}
-        }
         stdout.flush().unwrap();
         prev_buffer = main_buffer.clone();
+        frame_count += 1;
     };
 
     // clean up
@@ -109,6 +105,4 @@ fn main() {
     stdout.execute(cursor::Show).unwrap();
     terminal::disable_raw_mode().unwrap();
     stdout.execute(terminal::LeaveAlternateScreen).unwrap();
-
-    println!("\nEvent to end of loop delays\n{:?}\n\n", event_delays);
 }
