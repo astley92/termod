@@ -27,12 +27,14 @@ fn main() {
     // - random colours
     let (width, height) = terminal::size().unwrap();
 
-    let mut main_buffer: Buffer;
-    let mut prev_buffer = Buffer::new(width, height, 0, 0);
+    let mut main_buffer= Buffer::new(width, height);
+    let mut prev_buffer = Buffer::new(width, height);
 
-    let mut bg_buffer= Buffer::new(width, height, 0, 0);
-    let mut input_buffer = Buffer::new(width / 2, height / 2, 10, 5);
-    let mut debug_buffer= Buffer::new(20,10,0, 0);
+    let mut bg_buffer= Buffer::new(width, height);
+    let mut input_buffer = Buffer::new(width / 2, height / 2);
+    let mut input_x: u16 = 10;
+    let mut input_y: u16 = 10;
+    let mut debug_buffer= Buffer::new(20,10);
     // run a loop
     //   - queue clearing the screen
     //   - queue printing each of those chars
@@ -47,10 +49,10 @@ fn main() {
                 event::Event::Key(event) => {
                     match event.code {
                         event::KeyCode::Esc => { break },
-                        event::KeyCode::Left => { input_buffer.x -= 1 },
-                        event::KeyCode::Right => { input_buffer.x += 1 },
-                        event::KeyCode::Up => { input_buffer.y -= 1 },
-                        event::KeyCode::Down => { input_buffer.y += 1 },
+                        event::KeyCode::Left => { input_x -= 1 },
+                        event::KeyCode::Right => { input_x += 1 },
+                        event::KeyCode::Up => { input_y -= 1 },
+                        event::KeyCode::Down => { input_y += 1 },
                         _ => {}
                     }
                 },
@@ -70,8 +72,9 @@ fn main() {
         debug_buffer.insert_char_slice(0, &fps_chars);
 
         // draw
-        input_buffer = input_buffer.merge(&debug_buffer).unwrap();
-        main_buffer = bg_buffer.merge(&input_buffer).unwrap();
+        input_buffer = input_buffer.merge(0, &debug_buffer).unwrap();
+        let input_buffer_position = input_x + input_y * main_buffer.width;
+        main_buffer = bg_buffer.merge(input_buffer_position as usize, &input_buffer).unwrap();
         stdout
             .queue(terminal::Clear(terminal::ClearType::Purge)).unwrap()
             .queue(cursor::MoveTo(0,0)).unwrap();
