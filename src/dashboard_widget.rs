@@ -13,12 +13,12 @@ pub struct DashboardState {
     pub debug_y: usize,
 }
 
-pub fn dashboard_init(myself: &mut Widget<DashboardState>) {
+fn dashboard_init(myself: &mut Widget<DashboardState>) {
     myself.state.debug_buffer = Buffer::new(20, 10);
     myself.state.bg_buffer= Buffer::new(myself.width, myself.height);
 }
 
-pub fn dashboard_event(myself: &mut Widget<DashboardState>, event_to_handle: &event::Event) {
+fn dashboard_event(myself: &mut Widget<DashboardState>, event_to_handle: &event::Event) {
     match event_to_handle {
         event::Event::Key(event) => {
             match event.code {
@@ -33,7 +33,7 @@ pub fn dashboard_event(myself: &mut Widget<DashboardState>, event_to_handle: &ev
     }
 }
 
-pub fn dashboard_update(myself: &mut Widget<DashboardState>) {
+fn dashboard_update(myself: &mut Widget<DashboardState>) {
     // update
     myself.state.frame_count += 1;
     let mut rng: ThreadRng = rand::thread_rng();
@@ -48,17 +48,36 @@ pub fn dashboard_update(myself: &mut Widget<DashboardState>) {
     myself.state.bg_buffer = bg_buffer;
 }
 
-pub fn dashboard_draw(myself: &mut Widget<DashboardState>) {
+fn dashboard_draw(myself: &mut Widget<DashboardState>) {
     let mut debug_buffer = myself.state.debug_buffer.clone();
     let fps_chars = Character::vec_from_string(&format!("Frame Count: {}", myself.state.frame_count));
     debug_buffer.insert_char_slice(0, &fps_chars);
     myself.state.debug_buffer = debug_buffer;
 }
 
-pub fn dashboard_generate_buffer(myself: &mut Widget<DashboardState>) -> Buffer {
+fn dashboard_generate_buffer(myself: &mut Widget<DashboardState>) -> Buffer {
     let bg_buffer = &myself.state.bg_buffer;
     let pos_to_insert = myself.state.debug_x + myself.state.debug_y * myself.width as usize;
     let debug_buffer = &myself.state.debug_buffer;
     bg_buffer.merge(pos_to_insert, &debug_buffer).unwrap()
 }
 
+pub fn new(width: u16, height: u16, x: usize, y: usize, title: String) -> Widget<DashboardState> {
+    return Widget {
+        width,
+        height,
+        title,
+        init_fn: dashboard_init,
+        event_fn: dashboard_event,
+        update_fn: dashboard_update,
+        draw_fn: dashboard_draw,
+        generate_buffer_fn: dashboard_generate_buffer,
+        state: DashboardState { 
+            frame_count: 0, 
+            debug_x: x, 
+            debug_y: y,
+            bg_buffer: Buffer::new(0, 0),
+            debug_buffer: Buffer::new(0, 0),
+        }
+    };
+}

@@ -6,8 +6,7 @@ use crossterm::event;
 use crossterm::cursor;
 
 use termod::buffer::Buffer;
-use termod::widget::Widget;
-use termod::dashboard_widget::*;
+use termod::dashboard_widget;
 
 fn main() {
     let mut stdout: Stdout = stdout();
@@ -20,23 +19,7 @@ fn main() {
     let mut main_buffer= Buffer::new(width, height);
     let mut prev_buffer = Buffer::new(width, height);
    
-    let mut dashboard_widget = Widget {
-        width: width-2,
-        height: height-2,
-        title: "Dashboard".to_string(),
-        init_fn: dashboard_init,
-        event_fn: dashboard_event,
-        update_fn: dashboard_update,
-        draw_fn: dashboard_draw,
-        generate_buffer_fn: dashboard_generate_buffer,
-        state: DashboardState { 
-            frame_count: 0, 
-            debug_x: 0, 
-            debug_y: 0,
-            bg_buffer: Buffer::new(0, 0),
-            debug_buffer: Buffer::new(0, 0),
-        }
-    };
+    let mut dashboard_widget = dashboard_widget::new(width-2, height-2, 0, 0, "Dashboard".to_string());
     dashboard_widget.init();
 
     loop {

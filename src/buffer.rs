@@ -83,7 +83,7 @@ mod insert_char_slice_tests {
     use crate::character::Character;
 
     #[test]
-    fn returns_true_on_success() {
+    fn inserts_the_chars_at_the_expected_places() {
         let mut buffer_one = Buffer::new(6, 3);
         let string_chars = Character::vec_from_string(&"----".to_string());
 
