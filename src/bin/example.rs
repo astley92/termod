@@ -6,6 +6,7 @@ use crossterm::event;
 use crossterm::cursor;
 
 use termod::buffer::Buffer;
+use termod::widget::WidgetTrait;
 use termod::{colours, dashboard_widget, widget};
 
 fn main() {
@@ -19,14 +20,20 @@ fn main() {
     let mut main_buffer= Buffer::new(width, height);
     let mut prev_buffer = Buffer::new(width, height);
     widget::add_buffer_border(&mut main_buffer, colours::GREY);
+    
     let mut dashboard_widget = dashboard_widget::new(width-2, height-2, 0, 0);
     dashboard_widget.init();
+
+    let mut widgets: Vec<Box<dyn WidgetTrait>> = vec![
+        Box::new(dashboard_widget),
+    ];
+    let active_widget = 0;
 
     loop {
         // event
         if event::poll(std::time::Duration::from_millis(30)).unwrap() {
             let event = event::read().unwrap();
-            dashboard_widget.handle_event(&event);
+            widgets[active_widget].handle_event(&event);
             match event {
                 event::Event::Key(event) => {
                     match event.code {
@@ -39,12 +46,12 @@ fn main() {
         };
 
         // update
-        dashboard_widget.update();
+        widgets[active_widget].update();
 
         // draw
-        dashboard_widget.draw();
+        widgets[active_widget].draw();
 
-        let dashboard_buffer = dashboard_widget.generate_buffer();
+        let dashboard_buffer = widgets[active_widget].generate_buffer();
         let insert_pos = width + 1;
         main_buffer = main_buffer.merge(insert_pos as usize, &dashboard_buffer).unwrap();
 

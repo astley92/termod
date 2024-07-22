@@ -14,6 +14,14 @@ pub struct Widget<T> {
     pub state: T,
 }
 
+pub trait WidgetTrait {
+    fn init(&mut self);
+    fn handle_event(&mut self, event_to_handle: &event::Event);
+    fn update(&mut self);
+    fn draw(&mut self);
+    fn generate_buffer(&mut self) -> Buffer;
+    fn get_title(&self) -> &String; 
+}
 
 impl<T> Widget<T> {
     pub fn init(&mut self) {

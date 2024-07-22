@@ -7,6 +7,9 @@ edition = "2021"
 [[bin]]
 name = "example"
 
+[[bin]]
+name = "widget_vec"
+
 [dependencies]
 crossterm = "0.27.0"
 rand = "0.8.5"

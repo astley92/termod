@@ -1,7 +1,7 @@
 use crate::buffer::Buffer;
 use crate::character::Character;
 use crate::colours;
-use crate::widget::{self, Widget};
+use crate::widget::{self, Widget, WidgetTrait};
 use crossterm::event;
 use rand::rngs::ThreadRng;
 use rand::Rng;
@@ -14,12 +14,20 @@ pub struct DashboardState {
     pub debug_y: usize,
 }
 
+impl WidgetTrait for Widget<DashboardState> {
+    fn init(&mut self) {self.init()}
+    fn handle_event(&mut self, event_to_handle: &event::Event) {self.handle_event(event_to_handle)}
+    fn update(&mut self) {self.update()}
+    fn draw(&mut self) {self.draw()}
+    fn generate_buffer(&mut self) -> Buffer {self.generate_buffer()}
+    fn get_title(&self) -> &String {&self.title}
+}
+
 fn dashboard_init(myself: &mut Widget<DashboardState>) {
     let mut debug_buffer = Buffer::new(20, 10);
     widget::add_buffer_border(&mut debug_buffer, colours::GREY);
     myself.state.debug_buffer = debug_buffer;
     myself.state.bg_buffer = Buffer::new(myself.width, myself.height);
-
 }
 
 fn dashboard_event(myself: &mut Widget<DashboardState>, event_to_handle: &event::Event) {
