@@ -1,6 +1,7 @@
 use crate::buffer::Buffer;
 use crate::character::Character;
-use crate::widget::Widget;
+use crate::colours;
+use crate::widget::{self, Widget};
 use crossterm::event;
 use rand::rngs::ThreadRng;
 use rand::Rng;
@@ -14,8 +15,11 @@ pub struct DashboardState {
 }
 
 fn dashboard_init(myself: &mut Widget<DashboardState>) {
-    myself.state.debug_buffer = Buffer::new(20, 10);
-    myself.state.bg_buffer= Buffer::new(myself.width, myself.height);
+    let mut debug_buffer = Buffer::new(20, 10);
+    widget::add_buffer_border(&mut debug_buffer, colours::GREY);
+    myself.state.debug_buffer = debug_buffer;
+    myself.state.bg_buffer = Buffer::new(myself.width, myself.height);
+
 }
 
 fn dashboard_event(myself: &mut Widget<DashboardState>, event_to_handle: &event::Event) {

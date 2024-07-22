@@ -1,5 +1,6 @@
-use crossterm::event;
+use crossterm::{event, style};
 use crate::buffer::Buffer;
+use crate::character::{self, Character};
 
 pub struct Widget<T> {
     pub width: u16,
@@ -35,4 +36,26 @@ impl<T> Widget<T> {
         return (self.generate_buffer_fn)(self);
     }
     
+}
+
+pub fn add_buffer_border(buffer: &mut Buffer, colour: style::Color) {
+    let buffer_width = buffer.width as usize;
+    let top_bottom_str = &"-".repeat(buffer_width - 2).to_string();
+    let top_bottom_line_chars = character::Character::vec_from_string(top_bottom_str);
+    for y in 0..buffer.height {
+        if y == 0 || y == buffer.height-1 {
+            // Top or bottom row
+            buffer.insert_char_slice(y as usize * buffer.width as usize + 1, &top_bottom_line_chars);
+        } else {
+            // Middle rows
+
+            let character = Character {
+                c: '|',
+                attributes: character::empty_attr_set(),
+                colour,
+            };
+            buffer[buffer_width as usize * y as usize] = character.clone();
+            buffer[buffer_width as usize * y as usize + buffer_width-1] = character.clone();
+        }
+    }
 }

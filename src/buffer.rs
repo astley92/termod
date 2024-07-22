@@ -104,6 +104,8 @@ mod insert_char_slice_tests {
 mod merge_tests {
     use std::any::type_name;
 
+    use crate::{character, colours};
+
     use super::*;
     use crossterm::style;
 
@@ -115,12 +117,11 @@ mod merge_tests {
     fn buffer_merge_returns_buffer() {
         let buffer_one = Buffer::new(6, 3);
         let mut buffer_two= Buffer::new(4, 1);
-        let attrs = style::Attributes::from(style::Attribute::Bold);
         for i in 0..buffer_two.len() {
             buffer_two[i] = Character {
                 c: '-',
-                colour: style::Color::Rgb { r: 0, g: 0, b: 0 },
-                attributes: attrs,
+                colour: colours::GREY, 
+                attributes: character::empty_attr_set(),
             }
         };
 
@@ -132,12 +133,11 @@ mod merge_tests {
     fn buffer_merge_returns_expected_buffer() {
         let buffer_one = Buffer::new(6, 3);
         let mut buffer_two= Buffer::new(4, 1);
-        let attrs = style::Attributes::from(style::Attribute::Bold);
         for i in 0..buffer_two.len() {
             buffer_two[i] = Character {
                 c: '-',
-                colour: style::Color::Rgb { r: 0, g: 0, b: 0 },
-                attributes: attrs,
+                colour: colours::GREY,
+                attributes: character::empty_attr_set(),
             }
         };
 
@@ -157,11 +157,11 @@ mod merge_tests {
     fn buffer_merge_doesnt_mutate_original_buffers() {
         let buffer_one = Buffer::new(6, 3);
         let mut buffer_two= Buffer::new(4, 1);
-        let attrs = style::Attributes::from(style::Attribute::Bold);
+        let attrs = character::empty_attr_set();
         for i in 0..buffer_two.len() {
             buffer_two[i] = Character {
                 c: '-',
-                colour: style::Color::Rgb { r: 0, g: 0, b: 0 },
+                colour: colours::GREY,
                 attributes: attrs,
             }
         };

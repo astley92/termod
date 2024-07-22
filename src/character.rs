@@ -1,11 +1,19 @@
 use crossterm::style;
 use rand::Rng;
 
+use crate::colours;
+
 #[derive(Clone, PartialEq)]
 pub struct Character {
     pub c: char,
     pub attributes: style::Attributes,
     pub colour: style::Color,
+}
+
+pub fn empty_attr_set() -> style::Attributes {
+    let mut attrs = style::Attributes::from(style::Attribute::Bold); 
+    attrs.unset(style::Attribute::Bold);
+    return attrs;
 }
 
 impl Character {
@@ -17,12 +25,10 @@ impl Character {
     ];
 
     pub fn blank() -> Character {
-        let mut attrs = style::Attributes::from(style::Attribute::Bold);
-        attrs.unset(style::Attribute::Bold);
         return Character {
             c: ' ',
-            colour: style::Color::Rgb { r: 0, g: 0, b: 0 },
-            attributes: attrs,
+            colour: colours::GREY,
+            attributes: empty_attr_set(),
         }
     }
     
@@ -37,8 +43,7 @@ impl Character {
         let b = rng.gen_range(0..=255);
         let colour = style::Color::Rgb {r: r, g: g, b: b};
         let attr_index = rng.gen_range(0..Self::ATTRIBUTES.len());
-        let mut attrs = style::Attributes::from(style::Attribute::Bold);
-        attrs.unset(style::Attribute::Bold);
+        let mut attrs = empty_attr_set();
         let attr = Self::ATTRIBUTES[attr_index];
         attrs.toggle(attr);
         return Character {
@@ -50,14 +55,12 @@ impl Character {
 
     pub fn vec_from_string(string: &String) -> Vec<Character> {
         let mut result: Vec<Character> = vec![];
-        let mut attrs = style::Attributes::from(style::Attribute::Bold);
-        attrs.unset(style::Attribute::Bold);
         let string_chars: Vec<char> = string.chars().collect();
         for i in 0..string_chars.len() {
             result.push(Character {
                 c: string_chars[i],
-                attributes: attrs,
-                colour: style::Color::Rgb { r: 100, g: 100, b: 100 }
+                attributes: empty_attr_set(),
+                colour: colours::GREY,
             })
         }
         return result;
