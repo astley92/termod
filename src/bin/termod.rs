@@ -6,8 +6,9 @@ use crossterm::event;
 use crossterm::cursor;
 
 use termod::buffer::Buffer;
+use termod::character::Character;
 use termod::widget::WidgetTrait;
-use termod::{colours, dashboard_widget, widget};
+use termod::{character, colours, dashboard_widget, git_widget, widget};
 
 fn main() {
     let mut stdout: Stdout = stdout();
@@ -24,10 +25,14 @@ fn main() {
     let mut dashboard_widget = dashboard_widget::new(width-2, height-2, 0, 0);
     dashboard_widget.init();
 
+    let mut git_widget = git_widget::new(width-2, height-2, 0, 0);
+    git_widget.init();
+
     let mut widgets: Vec<Box<dyn WidgetTrait>> = vec![
         Box::new(dashboard_widget),
+        Box::new(git_widget),
     ];
-    let active_widget = 0;
+    let mut active_widget = 0;
 
     loop {
         // event
@@ -38,6 +43,7 @@ fn main() {
                 event::Event::Key(event) => {
                     match event.code {
                         event::KeyCode::Esc => { break },
+                        event::KeyCode::Tab => { active_widget += 1; active_widget = active_widget % widgets.len() }
                         _ => {}
                     }
                 },
@@ -50,10 +56,25 @@ fn main() {
 
         // draw
         widgets[active_widget].draw();
-
         let dashboard_buffer = widgets[active_widget].generate_buffer();
         let insert_pos = width + 1;
         main_buffer = main_buffer.merge(insert_pos as usize, &dashboard_buffer).unwrap();
+        let mut title_str_pos = 2;
+        for i in 0..widgets.len() {
+            let title_str = widgets[i].get_title();
+            let mut title_chars = Character::vec_from_string(title_str);
+            if i == active_widget {
+                for c in 0..title_chars.len() {
+                    title_chars[c].highlight();
+                }
+            }
+
+            for j in 0..title_chars.len() {
+                main_buffer[title_str_pos + j] = title_chars[j].clone();
+            }
+
+            title_str_pos += title_chars.len() + 1;
+        }
 
         stdout
             .queue(terminal::Clear(terminal::ClearType::Purge)).unwrap()

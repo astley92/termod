@@ -65,6 +65,10 @@ impl Character {
         }
         return result;
     }
+
+    pub fn highlight(&mut self) {
+        self.attributes.set(style::Attribute::Reverse);
+    }
 }
 
 #[cfg(test)]
