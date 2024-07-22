@@ -18,8 +18,8 @@ fn main() {
 
     let mut main_buffer= Buffer::new(width, height);
     let mut prev_buffer = Buffer::new(width, height);
-    widget::add_buffer_border(&mut main_buffer, colours::GREY);   
-    let mut dashboard_widget = dashboard_widget::new(width-2, height-2, 0, 0, "Dashboard".to_string());
+    widget::add_buffer_border(&mut main_buffer, colours::GREY);
+    let mut dashboard_widget = dashboard_widget::new(width-2, height-2, 0, 0);
     dashboard_widget.init();
 
     loop {

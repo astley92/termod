@@ -66,11 +66,11 @@ fn dashboard_generate_buffer(myself: &mut Widget<DashboardState>) -> Buffer {
     bg_buffer.merge(pos_to_insert, &debug_buffer).unwrap()
 }
 
-pub fn new(width: u16, height: u16, x: usize, y: usize, title: String) -> Widget<DashboardState> {
+pub fn new(width: u16, height: u16, x: usize, y: usize) -> Widget<DashboardState> {
     return Widget {
         width,
         height,
-        title,
+        title: "Dashboard".to_string(),
         init_fn: dashboard_init,
         event_fn: dashboard_event,
         update_fn: dashboard_update,
