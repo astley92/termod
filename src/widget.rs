@@ -49,7 +49,7 @@ impl<T> Widget<T> {
 pub fn add_buffer_border(buffer: &mut Buffer, colour: style::Color) {
     let buffer_width = buffer.width as usize;
     let top_bottom_str = &"-".repeat(buffer_width - 2).to_string();
-    let top_bottom_line_chars = character::Character::vec_from_string(top_bottom_str);
+    let top_bottom_line_chars = character::Character::vec_from_string(top_bottom_str, Some(colour));
     for y in 0..buffer.height {
         if y == 0 || y == buffer.height-1 {
             // Top or bottom row

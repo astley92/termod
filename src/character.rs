@@ -53,14 +53,18 @@ impl Character {
         };
     }
 
-    pub fn vec_from_string(string: &String) -> Vec<Character> {
+    pub fn vec_from_string(string: &String, colour: Option<style::Color>) -> Vec<Character> {
         let mut result: Vec<Character> = vec![];
         let string_chars: Vec<char> = string.chars().collect();
+        let colour_for_chars = match colour {
+            Some(c) => {c},
+            _ => {colours::LIGHT_GREY}
+        };
         for i in 0..string_chars.len() {
             result.push(Character {
                 c: string_chars[i],
                 attributes: empty_attr_set(),
-                colour: colours::GREY,
+                colour: colour_for_chars,
             })
         }
         return result;
@@ -84,7 +88,7 @@ mod tests {
     fn vec_from_string() {
         let starting_string = "Hello World".to_string();
         let starting_string_chars: Vec<char> = starting_string.chars().collect();
-        let result = Character::vec_from_string(&starting_string);
+        let result = Character::vec_from_string(&starting_string, None);
         for i in 0..starting_string.len() {
             let character = &result[i];
             assert_eq!(type_of(character), "termod::character::Character");

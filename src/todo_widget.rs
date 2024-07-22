@@ -1,11 +1,11 @@
 use crate::buffer::Buffer;
-use crate::widget::{self, Widget, WidgetTrait};
+use crate::widget::{Widget, WidgetTrait};
 use crossterm::event;
 
-pub struct GitState {
+pub struct TodoState {
 }
 
-impl WidgetTrait for Widget<GitState> {
+impl WidgetTrait for Widget<TodoState> {
     fn init(&mut self) {self.init()}
     fn handle_event(&mut self, event_to_handle: &event::Event) {self.handle_event(event_to_handle)}
     fn update(&mut self) {self.update()}
@@ -14,32 +14,32 @@ impl WidgetTrait for Widget<GitState> {
     fn get_title(&self) -> &String {&self.title}
 }
 
-fn init(myself: &mut Widget<GitState>) {
+fn init(myself: &mut Widget<TodoState>) {
 }
 
-fn event(myself: &mut Widget<GitState>, event_to_handle: &event::Event) {
+fn event(myself: &mut Widget<TodoState>, event_to_handle: &event::Event) {
 }
 
-fn update(myself: &mut Widget<GitState>) {
+fn update(myself: &mut Widget<TodoState>) {
 }
 
-fn draw(myself: &mut Widget<GitState>) {
+fn draw(myself: &mut Widget<TodoState>) {
 }
 
-fn generate_buffer(myself: &mut Widget<GitState>) -> Buffer {
+fn generate_buffer(myself: &mut Widget<TodoState>) -> Buffer {
     Buffer::new(7, 7)
 }
 
-pub fn new(width: u16, height: u16, x: usize, y: usize) -> Widget<GitState> {
+pub fn new(width: u16, height: u16, x: usize, y: usize) -> Widget<TodoState> {
     return Widget {
         width,
         height,
-        title: "GIT".to_string(),
+        title: "Todo".to_string(),
         init_fn: init,
         event_fn: event,
         update_fn: update,
         draw_fn: draw,
         generate_buffer_fn: generate_buffer,
-        state: GitState { }
+        state: TodoState { }
     };
 }

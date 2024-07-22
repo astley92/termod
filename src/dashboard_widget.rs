@@ -25,7 +25,7 @@ impl WidgetTrait for Widget<DashboardState> {
 
 fn dashboard_init(myself: &mut Widget<DashboardState>) {
     let mut debug_buffer = Buffer::new(20, 10);
-    widget::add_buffer_border(&mut debug_buffer, colours::GREY);
+    widget::add_buffer_border(&mut debug_buffer, colours::LIGHT_GREY);
     myself.state.debug_buffer = debug_buffer;
     myself.state.bg_buffer = Buffer::new(myself.width, myself.height);
 }
@@ -62,7 +62,7 @@ fn dashboard_update(myself: &mut Widget<DashboardState>) {
 
 fn dashboard_draw(myself: &mut Widget<DashboardState>) {
     let mut debug_buffer = myself.state.debug_buffer.clone();
-    let fps_chars = Character::vec_from_string(&format!("Frame Count: {}", myself.state.frame_count));
+    let fps_chars = Character::vec_from_string(&format!("Frame Count: {}", myself.state.frame_count), None);
     debug_buffer.insert_char_slice(0, &fps_chars);
     myself.state.debug_buffer = debug_buffer;
 }

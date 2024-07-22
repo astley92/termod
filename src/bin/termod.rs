@@ -7,8 +7,8 @@ use crossterm::cursor;
 
 use termod::buffer::Buffer;
 use termod::character::Character;
-use termod::widget::WidgetTrait;
-use termod::{colours, dashboard_widget, git_widget, widget};
+use termod::widget::{self, WidgetTrait};
+use termod::{colours, dashboard_widget, todo_widget};
 
 fn main() {
     let mut stdout: Stdout = stdout();
@@ -20,24 +20,24 @@ fn main() {
 
     let mut main_buffer= Buffer::new(width, height);
     let mut prev_buffer = Buffer::new(width, height);
-    widget::add_buffer_border(&mut main_buffer, colours::GREY);
+    widget::add_buffer_border(&mut main_buffer, colours::LIGHT_GREY);
     
     let mut dashboard_widget = dashboard_widget::new(width-2, height-2, 0, 0);
     dashboard_widget.init();
 
-    let mut git_widget = git_widget::new(width-2, height-2, 0, 0);
-    git_widget.init();
+    let mut todo_widget = todo_widget::new(width-2, height-2, 0, 0);
+    todo_widget.init();
 
     let mut widgets: Vec<Box<dyn WidgetTrait>> = vec![
         Box::new(dashboard_widget),
-        Box::new(git_widget),
+        Box::new(todo_widget),
     ];
     let mut active_widget = 0;
     let mut active_widget_changed= true;
 
     loop {
         // event
-        if event::poll(std::time::Duration::from_millis(30)).unwrap() {
+        if event::poll(std::time::Duration::from_millis(50)).unwrap() {
             let event = event::read().unwrap();
             widgets[active_widget].handle_event(&event);
             match event {
@@ -69,7 +69,7 @@ fn main() {
             let mut title_str_pos = 2;
             for i in 0..widgets.len() {
                 let title_str = widgets[i].get_title();
-                let mut title_chars = Character::vec_from_string(title_str);
+                let mut title_chars = Character::vec_from_string(title_str, None);
                 if i == active_widget {
                     for c in 0..title_chars.len() {
                         title_chars[c].highlight();
