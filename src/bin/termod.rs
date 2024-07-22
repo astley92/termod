@@ -8,7 +8,7 @@ use crossterm::cursor;
 use termod::buffer::Buffer;
 use termod::character::Character;
 use termod::widget::WidgetTrait;
-use termod::{character, colours, dashboard_widget, git_widget, widget};
+use termod::{colours, dashboard_widget, git_widget, widget};
 
 fn main() {
     let mut stdout: Stdout = stdout();
@@ -33,6 +33,7 @@ fn main() {
         Box::new(git_widget),
     ];
     let mut active_widget = 0;
+    let mut active_widget_changed= true;
 
     loop {
         // event
@@ -43,7 +44,11 @@ fn main() {
                 event::Event::Key(event) => {
                     match event.code {
                         event::KeyCode::Esc => { break },
-                        event::KeyCode::Tab => { active_widget += 1; active_widget = active_widget % widgets.len() }
+                        event::KeyCode::Tab => { 
+                            active_widget += 1; 
+                            active_widget = active_widget % widgets.len();
+                            active_widget_changed = true;
+                        }
                         _ => {}
                     }
                 },
@@ -59,21 +64,25 @@ fn main() {
         let dashboard_buffer = widgets[active_widget].generate_buffer();
         let insert_pos = width + 1;
         main_buffer = main_buffer.merge(insert_pos as usize, &dashboard_buffer).unwrap();
-        let mut title_str_pos = 2;
-        for i in 0..widgets.len() {
-            let title_str = widgets[i].get_title();
-            let mut title_chars = Character::vec_from_string(title_str);
-            if i == active_widget {
-                for c in 0..title_chars.len() {
-                    title_chars[c].highlight();
+        
+        if active_widget_changed {
+            let mut title_str_pos = 2;
+            for i in 0..widgets.len() {
+                let title_str = widgets[i].get_title();
+                let mut title_chars = Character::vec_from_string(title_str);
+                if i == active_widget {
+                    for c in 0..title_chars.len() {
+                        title_chars[c].highlight();
+                    }
                 }
-            }
 
-            for j in 0..title_chars.len() {
-                main_buffer[title_str_pos + j] = title_chars[j].clone();
-            }
+                for j in 0..title_chars.len() {
+                    main_buffer[title_str_pos + j] = title_chars[j].clone();
+                }
 
-            title_str_pos += title_chars.len() + 1;
+                title_str_pos += title_chars.len() + 1;
+            }
+            active_widget_changed = false;
         }
 
         stdout
