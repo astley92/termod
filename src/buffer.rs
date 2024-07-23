@@ -63,6 +63,10 @@ impl Buffer {
             }
         }
     }
+
+    pub fn clear(&mut self) {
+        self.characters = Character::vec_from_string(&" ".repeat(self.width as usize * self.height as usize), None, None);
+    }
 }
 
 impl std::ops::Index<usize> for Buffer {

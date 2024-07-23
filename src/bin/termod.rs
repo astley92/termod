@@ -37,7 +37,7 @@ fn main() {
 
     loop {
         // event
-        if event::poll(std::time::Duration::from_millis(50)).unwrap() {
+        if event::poll(std::time::Duration::from_millis(33)).unwrap() {
             let event = event::read().unwrap();
             widgets[active_widget_index].handle_event(&event);
             match event {

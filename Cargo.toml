@@ -11,5 +11,6 @@ name = "termod"
 name = "widget_vec"
 
 [dependencies]
+chrono = "0.4.38"
 crossterm = "0.27.0"
 rand = "0.8.5"
