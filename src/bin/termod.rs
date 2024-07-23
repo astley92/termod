@@ -29,24 +29,24 @@ fn main() {
     todo_widget.init();
 
     let mut widgets: Vec<Box<dyn WidgetTrait>> = vec![
-        Box::new(dashboard_widget),
         Box::new(todo_widget),
+        Box::new(dashboard_widget),
     ];
-    let mut active_widget = 0;
+    let mut active_widget_index = 0;
     let mut active_widget_changed= true;
 
     loop {
         // event
         if event::poll(std::time::Duration::from_millis(50)).unwrap() {
             let event = event::read().unwrap();
-            widgets[active_widget].handle_event(&event);
+            widgets[active_widget_index].handle_event(&event);
             match event {
                 event::Event::Key(event) => {
                     match event.code {
                         event::KeyCode::Esc => { break },
                         event::KeyCode::Tab => { 
-                            active_widget += 1; 
-                            active_widget = active_widget % widgets.len();
+                            active_widget_index += 1; 
+                            active_widget_index = active_widget_index % widgets.len();
                             active_widget_changed = true;
                         }
                         _ => {}
@@ -57,20 +57,20 @@ fn main() {
         };
 
         // update
-        widgets[active_widget].update();
+        widgets[active_widget_index].update();
 
         // draw
-        widgets[active_widget].draw();
-        let dashboard_buffer = widgets[active_widget].generate_buffer();
+        widgets[active_widget_index].draw();
+        let active_widget_buffer = widgets[active_widget_index].generate_buffer();
         let insert_pos = width + 1;
-        main_buffer = main_buffer.merge(insert_pos as usize, &dashboard_buffer).unwrap();
-        
+        main_buffer = main_buffer.merge(insert_pos as usize, &active_widget_buffer).unwrap();
+
         if active_widget_changed {
             let mut title_str_pos = 2;
             for i in 0..widgets.len() {
                 let title_str = widgets[i].get_title();
                 let mut title_chars = Character::vec_from_string(title_str, None, None);
-                if i == active_widget {
+                if i == active_widget_index {
                     for c in 0..title_chars.len() {
                         title_chars[c].highlight();
                     }
