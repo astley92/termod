@@ -1,5 +1,3 @@
-use std::io::empty;
-
 use crossterm::style;
 use rand::Rng;
 
