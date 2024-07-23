@@ -58,7 +58,9 @@ impl Buffer {
     pub fn insert_char_slice(&mut self, position: usize, chars: &Vec<Character>) {
         for i in 0..chars.len() {
             let offset = i + position;
-            self.characters[offset] = chars[i].clone()
+            if self.characters[offset] != chars[i] {
+                self.characters[offset] = chars[i].clone()
+            }
         }
     }
 }
@@ -85,7 +87,7 @@ mod insert_char_slice_tests {
     #[test]
     fn inserts_the_chars_at_the_expected_places() {
         let mut buffer_one = Buffer::new(6, 3);
-        let string_chars = Character::vec_from_string(&"----".to_string(), None);
+        let string_chars = Character::vec_from_string(&"----".to_string(), None, None);
 
         buffer_one.insert_char_slice(7, &string_chars);
         let expected_res = [

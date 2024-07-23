@@ -69,7 +69,7 @@ fn main() {
             let mut title_str_pos = 2;
             for i in 0..widgets.len() {
                 let title_str = widgets[i].get_title();
-                let mut title_chars = Character::vec_from_string(title_str, None);
+                let mut title_chars = Character::vec_from_string(title_str, None, None);
                 if i == active_widget {
                     for c in 0..title_chars.len() {
                         title_chars[c].highlight();

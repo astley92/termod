@@ -62,7 +62,7 @@ fn dashboard_update(myself: &mut Widget<DashboardState>) {
 
 fn dashboard_draw(myself: &mut Widget<DashboardState>) {
     let mut debug_buffer = myself.state.debug_buffer.clone();
-    let fps_chars = Character::vec_from_string(&format!("Frame Count: {}", myself.state.frame_count), None);
+    let fps_chars = Character::vec_from_string(&format!("Frame Count: {}", myself.state.frame_count), None, None);
     debug_buffer.insert_char_slice(0, &fps_chars);
     myself.state.debug_buffer = debug_buffer;
 }
